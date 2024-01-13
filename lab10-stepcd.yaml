@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: stepcd
+spec:
+  schedule: "*/2 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          restartPolicy: Never
+          serviceAccountName: gitops
+          containers:
+            - name: lab10-gitops
+              image: maciek48/lab10-app:$/lab10-gitops
+              command: [sh, -e, -c]
+              args:
+                - git clone https://github.com/Maciek48/lab10-config.git /tmp/lab10-config && find /tmp/lab10-config -name '*.yaml' -exec kubectl apply -f {} \;
